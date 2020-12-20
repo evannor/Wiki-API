@@ -61,6 +61,17 @@ app.route("/articles")
   });
 });
 
+app.route("/articles/:postTitle").get(function(req, res) {
+  let postTitle = req.params.postTitle;
+  Article.findOne({ title: postTitle}, function (err, article) {
+    if(!err) {
+      res.send(article);
+    } else {
+      res.send(err);
+    }
+  })
+}).post().delete();
+
 app.listen(3000, function() {
   console.log("Server is running on port 3000");
 });
