@@ -6,7 +6,8 @@ const mongoose = require('mongoose');
 const app = express();
 mongoose.connect('mongodb://localhost:27017/wikiDB', {
   useNewUrlParser: true, 
-  useUnifiedTopology: true
+  useUnifiedTopology: true,
+  useFindAndModify: false
 });
 
 app.set('view engine', 'ejs');
@@ -72,14 +73,22 @@ app.route("/articles/:postTitle").get(function(req, res) {
 }).put(function(req, res) {
   Article.replaceOne(
     { title: req.params.postTitle },
-    {title: req.body.title, content: req.body.content}, function(err, updateArticle) {
+    {title: req.body.title, content: req.body.content}, function(err, updatedArticle) {
       if(!err) {
         res.send("Updated the article as requested.");
       } else {
         res.send(err);
-      }
-    })
-}).delete();
+      }})
+}).patch(function(req, res) {
+  Article.updateOne(
+    {title: req.params.postTitle},
+    {$set: req.body}, function(err) {
+      if(!err) {
+        res.send("Successfully updated article.");
+      } else {
+        res.send(err);
+      }})
+});
 
 app.listen(3000, function() {
   console.log("Server is running on port 3000");
