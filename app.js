@@ -24,6 +24,8 @@ const articleSchema = {
 
 const Article = mongoose.model('Article', articleSchema);
 
+// //////////////////////////// Chained Routes for whole collection //////////////
+
 app.route("/articles")
 
 .get(function (req, res) {
@@ -62,7 +64,11 @@ app.route("/articles")
   });
 });
 
-app.route("/articles/:postTitle").get(function(req, res) {
+// //////////////////////////// Chained Routes for individual articles //////////////
+
+app.route("/articles/:postTitle")
+
+.get(function(req, res) {
   Article.findOne({ title: req.params.postTitle }, function (err, article) {
     if(!err) {
       res.send(article);
@@ -70,7 +76,9 @@ app.route("/articles/:postTitle").get(function(req, res) {
       res.send(err);
     }
   })
-}).put(function(req, res) {
+})
+
+.put(function(req, res) {
   Article.replaceOne(
     { title: req.params.postTitle },
     {title: req.body.title, content: req.body.content}, function(err, updatedArticle) {
@@ -79,12 +87,24 @@ app.route("/articles/:postTitle").get(function(req, res) {
       } else {
         res.send(err);
       }})
-}).patch(function(req, res) {
+})
+
+.patch(function(req, res) {
   Article.updateOne(
     {title: req.params.postTitle},
     {$set: req.body}, function(err) {
       if(!err) {
         res.send("Successfully updated article.");
+      } else {
+        res.send(err);
+      }})
+})
+
+.delete(function(req, res) {
+  Article.deleteOne(
+    {title: req.params.postTitle}, function(err) {
+      if(!err) {
+        res.send("The article has been deleted.");
       } else {
         res.send(err);
       }})
